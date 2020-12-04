@@ -1,0 +1,16 @@
+{
+  // python settings
+  "python.venvPath": ".venv",
+  "python.pythonPath": "/Users/ohtaniyuichi/.pyenv/versions/3.7.0/bin/python",
+
+  "python.formatting.provider": "black",
+
+  "python.linting.pylintEnabled": false,
+  "python.linting.mypyEnabled": true,
+  "python.linting.lintOnSave": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.flake8Args": [
+    "--max-line-length=88"
+  ],
+  "editor.formatOnSave": true
+}
