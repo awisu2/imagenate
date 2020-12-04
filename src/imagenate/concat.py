@@ -1,10 +1,10 @@
 from typing import List
 from pathlib import Path
 from PIL import Image
-from enum import Enum
+from imagenate.libs.enum import CustomEnum
 
 
-class Direction(Enum):
+class Direction(CustomEnum):
     # 水平
     HORIZONTAL = "horizontal"
     # 垂直
