@@ -77,6 +77,11 @@ def get_concat_dir_argperser() -> ArgumentParser:
         default=".png",
         help="出力ファイル拡張子",
     )
+    argperser.add_argument(
+        "--add_dir",
+        action="store_true",
+        help="出力先にinputと同名のディレクトリを追加する",
+    )
     return argperser
 
 
@@ -122,6 +127,7 @@ def concat_dir():
         cel_position=cel_position,
         prefix=args.prefix,
         ext=args.ext,
+        add_dir=args.add_dir,
     )
 
     print("created:")
