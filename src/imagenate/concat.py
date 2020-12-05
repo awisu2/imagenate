@@ -15,11 +15,68 @@ class Position:
         self.y = 0
 
 
-class Direction(CustomEnum):
-    # 水平
-    HORIZONTAL = "horizontal"
-    # 垂直
-    VERTICAL = "vertical"
+class CelPosition(CustomEnum):
+    """結合処理時の各セルの中で位置調整"""
+
+    TOP_LEFT = "top_left"
+    TOP_CENTER = "top_center"
+    TOP_RIGHT = "top_right"
+
+    MIDDLE_LEFT = "middle_left"
+    CENTER = "center"
+    MIDDLE_RIGHT = "middle_right"
+
+    BOTTOM_LEFT = "bottom_left"
+    BOTTOM_CENTER = "bottom_center"
+    BOTTOM_RIGHT = "bottom_right"
+
+    @property
+    def is_top(self):
+        return self in [
+            CelPosition.TOP_LEFT,
+            CelPosition.TOP_CENTER,
+            CelPosition.TOP_RIGHT,
+        ]
+
+    @property
+    def is_middle(self):
+        return self in [
+            CelPosition.MIDDLE_LEFT,
+            CelPosition.CENTER,
+            CelPosition.MIDDLE_RIGHT,
+        ]
+
+    @property
+    def is_bottom(self):
+        return self in [
+            CelPosition.BOTTOM_LEFT,
+            CelPosition.BOTTOM_CENTER,
+            CelPosition.BOTTOM_RIGHT,
+        ]
+
+    @property
+    def is_left(self):
+        return self in [
+            CelPosition.TOP_LEFT,
+            CelPosition.MIDDLE_LEFT,
+            CelPosition.BOTTOM_LEFT,
+        ]
+
+    @property
+    def is_center(self):
+        return self in [
+            CelPosition.TOP_CENTER,
+            CelPosition.CENTER,
+            CelPosition.BOTTOM_CENTER,
+        ]
+
+    @property
+    def is_right(self):
+        return self in [
+            CelPosition.TOP_RIGHT,
+            CelPosition.MIDDLE_RIGHT,
+            CelPosition.BOTTOM_RIGHT,
+        ]
 
 
 def concat_image_by_path(pathes: List[str], **kwargs) -> Image:
@@ -92,7 +149,32 @@ def _get_sizes(grid: List[List[Any]]) -> Tuple[List[int], List[int]]:
     return widthes, heights
 
 
-def concat_image(images, *, row: int = 0, col: int = 0) -> Image:
+def _get_diff(cel_position: CelPosition, width: int, height: int, cel: Image):
+    """セル内に収まらないときの調整料を取得"""
+    diff = Position()
+
+    if width > cel.width:
+        if cel_position.is_center:
+            diff.x = (width - cel.width) // 2
+        elif cel_position.is_right:
+            diff.x = width - cel.width
+
+    if height > cel.height:
+        if cel_position.is_middle:
+            diff.y = (height - cel.height) // 2
+        elif cel_position.is_bottom:
+            diff.y = height - cel.height
+
+    return diff
+
+
+def concat_image(
+    images,
+    *,
+    row: int = 0,
+    col: int = 0,
+    cel_position: CelPosition = CelPosition.CENTER,
+) -> Image:
     """画像を結合したオブジェクトを返却"""
 
     # パラメータチェック
@@ -112,7 +194,6 @@ def concat_image(images, *, row: int = 0, col: int = 0) -> Image:
     # 貼り付け
     image = Image.new("RGB", (sum(widthes), sum(heights)))
     pos = Position()
-    diff = Position()
     for r in range(0, len(grid)):
         line = grid[r]
         pos.x = 0
@@ -121,13 +202,7 @@ def concat_image(images, *, row: int = 0, col: int = 0) -> Image:
             cel = line[c]
             width = widthes[c]
 
-            # サイズより小さかった場合、中央になるように調整
-            diff.reset()
-            if width > cel.width:
-                diff.x = (width - cel.width) // 2
-            if height > cel.height:
-                diff.y = (height - cel.height) // 2
-
+            diff = _get_diff(cel_position, width, height, cel)
             image.paste(cel, (pos.x + diff.x, pos.y + diff.y))
             pos.x += width
         pos.y += height

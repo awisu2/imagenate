@@ -2,7 +2,7 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 from imagenate.main.share import create_base_argperser
-from imagenate.concat import concat_image_by_path
+from imagenate.concat import concat_image_by_path, CelPosition
 
 
 def get_argperser() -> ArgumentParser:
@@ -35,6 +35,13 @@ def get_argperser() -> ArgumentParser:
         required=True,
         help="出力先の画像パス",
     )
+    argperser.add_argument(
+        "--cel_position",
+        type=str,
+        choices=CelPosition.get_values(),
+        default=CelPosition.CENTER,
+        help="結合時に余白が出た際の位置調整",
+    )
     return argperser
 
 
@@ -50,7 +57,10 @@ def concat():
 
     # 処理
     out = Path(args.out)
-    image = concat_image_by_path(args.input, row=args.row, col=args.col)
+    cel_position = CelPosition(args.cel_position)
+    image = concat_image_by_path(
+        args.input, row=args.row, col=args.col, cel_position=cel_position
+    )
     if not image:
         print("missing create concat image")
         return
