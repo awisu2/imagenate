@@ -1,6 +1,6 @@
 from .main.share import create_base_argperser, Command
 from .main.create import create
-from .main.concat import concat
+from .main.concat import concat, concat_dir
 
 
 def main():
@@ -10,6 +10,8 @@ def main():
 
     if command == Command.CONCAT:
         concat()
+    if command == Command.CONCAT_DIR:
+        concat_dir()
     elif command == Command.CREATE:
         create()
 

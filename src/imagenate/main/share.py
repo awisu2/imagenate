@@ -5,6 +5,7 @@ from imagenate.libs.enum import CustomEnum
 
 class Command(CustomEnum):
     CONCAT = "concat"
+    CONCAT_DIR = "concat_dir"
     CREATE = "create"
 
 
