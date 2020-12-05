@@ -1,9 +1,18 @@
-from typing import List, Any
+from typing import List, Any, Tuple
 from pathlib import Path
 import math
 
 from PIL import Image
 from imagenate.libs.enum import CustomEnum
+
+# TODO: 可能ならライブラリのクラス使いたい
+class Position:
+    x: int = 0
+    y: int = 0
+
+    def reset(self):
+        self.x = 0
+        self.y = 0
 
 
 class Direction(CustomEnum):
@@ -61,6 +70,28 @@ def _get_grids(images, row: int, col: int) -> List[List[Any]]:
     return grid
 
 
+def _get_sizes(grid: List[List[Any]]) -> Tuple[List[int], List[int]]:
+    """縦横格子状に並んでいるときの分割サイズを取得
+
+    1行目は3列、２行目は２列などには未対応
+    """
+    widthes = [0] * len(grid)
+    heights = [0] * len(grid[0])
+
+    # 縦横の最大サイズを、行列のサイズとして取得
+    for r in range(0, len(grid)):
+        line = grid[r]
+        for c in range(0, len(line)):
+            cel = line[c]
+            if heights[r] < cel.height:
+                heights[r] = cel.height
+
+            if widthes[c] < cel.width:
+                widthes[c] = cel.width
+
+    return widthes, heights
+
+
 def concat_image(images, *, row: int = 0, col: int = 0) -> Image:
     """画像を結合したオブジェクトを返却"""
 
@@ -70,48 +101,35 @@ def concat_image(images, *, row: int = 0, col: int = 0) -> Image:
     if row <= 0 and col <= 0:
         return None
 
-    # グリッドに配置
     # TODO: サイズ違いで正方形のグリッドに収まらない場合もある
-    grid = _get_grids(images, row, col)
-
-    # 最終的なサイズなどを取得
     # TODO: 詰めて並べる分割
     # TODO: 拡大方法別の分割
 
-    # 等分のサイズでの分割
-    height = 0
-    width = 0
-    for line in grid:
-        # 行の情報を収集
-        line_width = 0
-        line_height = 0
-        size_line = []
-        for cel in line:
-            size_cel = (cel.width, cel.height)
-            size_line.append(size_cel)
+    # グリッドに配置
+    grid = _get_grids(images, row, col)
+    # サイズの取得
+    widthes, heights = _get_sizes(grid)
+    # 貼り付け
+    image = Image.new("RGB", (sum(widthes), sum(heights)))
+    pos = Position()
+    diff = Position()
+    for r in range(0, len(grid)):
+        line = grid[r]
+        pos.x = 0
+        height = heights[r]
+        for c in range(0, len(line)):
+            cel = line[c]
+            width = widthes[c]
 
-            line_width += cel.width
-            if line_height < cel.height:
-                line_height = cel.height
+            # サイズより小さかった場合、中央になるように調整
+            diff.reset()
+            if width > cel.width:
+                diff.x = (width - cel.width) // 2
+            if height > cel.height:
+                diff.y = (height - cel.height) // 2
 
-        # 土台用に調整
-        height += line_height
-
-        if width < line_width:
-            width = line_width
-
-    # 土台となる画像の作成と貼り付け
-    image = Image.new("RGB", (width, height))
-    x = 0
-    y = 0
-    for line in grid:
-        x = 0
-        max_height = 0
-        for cel in line:
-            image.paste(cel, (x, y))
-            x += cel.width
-            if cel.height > max_height:
-                max_height = cel.height
-        y += max_height
+            image.paste(cel, (pos.x + diff.x, pos.y + diff.y))
+            pos.x += width
+        pos.y += height
 
     return image
