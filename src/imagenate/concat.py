@@ -107,6 +107,7 @@ def concat_image_by_dir(
     ext: str = ".png",
     prefix: str = "concat",
     add_dir: bool = False,
+    add_verbose: bool = False,
     **kwargs,
 ) -> List[Path]:
     """パスをもとに画像を結合"""
@@ -119,7 +120,10 @@ def concat_image_by_dir(
 
     out_path: Path = Path(out) if out else input_path / "concat"
     if add_dir:
-        out_path = out_path / input_path.name
+        if add_verbose:
+            out_path = out_path / f"{input_path.name}_{col}x{row}"
+        else:
+            out_path = out_path / input_path.name
 
     if not out_path.is_dir():
         if out_path.exists():

@@ -82,6 +82,11 @@ def get_concat_dir_argperser() -> ArgumentParser:
         action="store_true",
         help="出力先にinputと同名のディレクトリを追加する",
     )
+    argperser.add_argument(
+        "--add_verbose",
+        action="store_true",
+        help="分割数などを出力ディレクトリに追加する(例: c=3, r=2のとき _3x2が追加される)",
+    )
     return argperser
 
 
@@ -128,6 +133,7 @@ def concat_dir():
         prefix=args.prefix,
         ext=args.ext,
         add_dir=args.add_dir,
+        add_verbose=args.add_verbose,
     )
 
     print("created:")
