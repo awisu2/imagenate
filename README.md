@@ -1,5 +1,11 @@
 # imagenatepy
 
+simple image manager for my study.
+
+- cmmandable
+- ibraryable
+- sample of setup.py and setup.cfg for create python package
+
 ## install
 
 ```bash
