@@ -4,6 +4,7 @@ import math
 
 from PIL import Image
 from imagenate.libs.enum import CustomEnum
+from imagenate.main.create import create
 
 # TODO: 可能ならライブラリのクラス使いたい
 class Position:
@@ -97,6 +98,74 @@ def concat_image_by_path(pathes: List[str], **kwargs) -> Image:
     return concat_image(images, **kwargs)
 
 
+def concat_image_by_dir(
+    input: str,
+    out: str,
+    row: int,
+    col: int,
+    *,
+    ext: str = ".png",
+    prefix: str = "concat",
+    **kwargs,
+) -> List[Path]:
+    """パスをもとに画像を結合"""
+
+    # パスがディレクトリであるかチェック
+    input_path = Path(input)
+    if not input_path.is_dir():
+        print(f"{input_path.absolute()} is not dir")
+        return
+
+    out_path: Path = Path(out) if out else input_path / "concat"
+    if not out_path.is_dir():
+        if out_path.exists():
+            print(f"{out_path.absolute()} is not dir")
+            return
+
+        # 作成を試みる
+        out_path.mkdir(parents=True, exist_ok=True)
+
+    # 1画像に必要な枚数
+    num = row * col
+
+    def _create_name(i: int):
+        return "{}_{}{}".format(prefix, f"0000{i}"[-4:], ext)
+
+    created_pathes = []
+    images = []
+    i = 0
+    for item in input_path.iterdir():
+        if not item.is_file:
+            continue
+
+        # 画像ファイルを収集(画像ファイルであれば正常に開ける)
+        image: Image = None
+        try:
+            image = Image.open(item)
+        except:
+            continue
+        images.append(image)
+
+        # 規定数に達していれば変換
+        if len(images) < num:
+            continue
+        image = concat_image(images, row=row, col=col, **kwargs)
+        path = out_path / _create_name(i)
+        image.save(path)
+        created_pathes.append(path)
+
+        images = []
+        i += 1
+
+    if images:
+        image = concat_image(images, row=row, col=col, **kwargs)
+        path = out_path / _create_name(i)
+        image.save(path)
+        created_pathes.append(path)
+
+    return created_pathes
+
+
 def _get_grids(images, row: int, col: int) -> List[List[Any]]:
     grid = []
 
@@ -132,8 +201,8 @@ def _get_sizes(grid: List[List[Any]]) -> Tuple[List[int], List[int]]:
 
     1行目は3列、２行目は２列などには未対応
     """
-    widthes = [0] * len(grid)
-    heights = [0] * len(grid[0])
+    heights = [0] * len(grid)
+    widthes = [0] * len(grid[0])
 
     # 縦横の最大サイズを、行列のサイズとして取得
     for r in range(0, len(grid)):

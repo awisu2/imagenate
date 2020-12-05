@@ -2,10 +2,10 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 from imagenate.main.share import create_base_argperser
-from imagenate.concat import concat_image_by_path, CelPosition
+from imagenate.concat import concat_image_by_path, concat_image_by_dir, CelPosition
 
 
-def get_argperser() -> ArgumentParser:
+def _get_argperser() -> ArgumentParser:
     argperser = create_base_argperser()
     argperser.add_argument(
         "-r",
@@ -22,20 +22,6 @@ def get_argperser() -> ArgumentParser:
         help="横の行数(default=0, 0の場合は無限)",
     )
     argperser.add_argument(
-        "-i",
-        "--input",
-        nargs="*",
-        type=str,
-        required=True,
-        help="結合対象の画像リスト",
-    )
-    argperser.add_argument(
-        "-o",
-        "--out",
-        required=True,
-        help="出力先の画像パス",
-    )
-    argperser.add_argument(
         "--cel_position",
         type=str,
         choices=CelPosition.get_values(),
@@ -45,12 +31,60 @@ def get_argperser() -> ArgumentParser:
     return argperser
 
 
+def get_concat_argperser() -> ArgumentParser:
+    argperser = _get_argperser()
+    argperser.add_argument(
+        "-i",
+        "--input",
+        nargs="*",
+        type=str,
+        required=True,
+        help="結合対象の画像パスリスト",
+    )
+    argperser.add_argument(
+        "-o",
+        "--out",
+        required=True,
+        help="出力先の画像パス",
+    )
+    return argperser
+
+
+def get_concat_dir_argperser() -> ArgumentParser:
+    argperser = _get_argperser()
+    argperser.add_argument(
+        "-i",
+        "--input",
+        type=str,
+        required=True,
+        help="結合対象の画像が存在するディレクトリ",
+    )
+    argperser.add_argument(
+        "-o",
+        "--out",
+        type=str,
+        help='出力先ディレクトリ。変換ディレクトリに内に "concat_{yymmddhhmmss}" ディレクトリを作成し出力',
+    )
+    argperser.add_argument(
+        "--prefix",
+        type=str,
+        default="concat",
+        help="結合ファイル名のprefix (default=concat)",
+    )
+    argperser.add_argument(
+        "--ext",
+        type=str,
+        default=".png",
+        help="出力ファイル拡張子",
+    )
+    return argperser
+
+
 def concat():
     """結合処理"""
 
-    args = get_argperser().parse_args()
-
     # パラメータチェック
+    args = get_concat_argperser().parse_args()
     if args.row <= 0 and args.col <= 0:
         print("row or col must have a value greater than or equal to 0")
         return
@@ -67,3 +101,29 @@ def concat():
 
     image.save(out)
     print(f"saved: {out.absolute()}")
+
+
+def concat_dir():
+    """結合処理 ディレクトリ"""
+
+    # パラメータチェック
+    args = get_concat_dir_argperser().parse_args()
+    if args.row <= 0 or args.col <= 0:
+        print("row and col must have a value greater than or equal to 0")
+        return
+
+    # 処理
+    cel_position = CelPosition(args.cel_position)
+    created_pathes = concat_image_by_dir(
+        args.input,
+        args.out,
+        args.row,
+        args.col,
+        cel_position=cel_position,
+        prefix=args.prefix,
+        ext=args.ext,
+    )
+
+    print("created:")
+    for path in created_pathes:
+        print(path.absolute())
