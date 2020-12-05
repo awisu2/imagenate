@@ -1,10 +1,15 @@
 from argparse import ArgumentParser
+from pathlib import Path
+
+from PIL import Image
+
 from imagenate.libs.enum import CustomEnum
 from .concat import concat_image_by_path
 
 
 class Command(CustomEnum):
     CONCAT = "concat"
+    CREATE = "create"
 
 
 def base_argperse() -> ArgumentParser:
@@ -20,10 +25,12 @@ def main():
     command = Command(args.command)
 
     if command == Command.CONCAT:
-        concat()
+        _concat()
+    elif command == Command.CREATE:
+        _create()
 
 
-def concat():
+def _concat():
     """結合処理"""
 
     def get_argperser() -> ArgumentParser:
@@ -65,13 +72,57 @@ def concat():
         print("row or col must have a value greater than or equal to 0")
         return
 
+    # 処理
+    out = Path(args.out)
     image = concat_image_by_path(args.input, row=args.row, col=args.col)
     if not image:
         print("missing create concat image")
         return
 
-    image.save(args.out)
-    print(f"saved {args.out}")
+    image.save(out)
+    print(f"saved: {out.absolute}")
+
+
+def _create():
+    def get_argperser() -> ArgumentParser:
+        argperser = base_argperse()
+        argperser.add_argument(
+            "-w",
+            "--width",
+            type=int,
+            required=True,
+            help="画像の幅",
+        )
+        argperser.add_argument(
+            "--height",
+            type=int,
+            required=True,
+            help="画像の高さ",
+        )
+        argperser.add_argument(
+            "-o",
+            "--out",
+            required=True,
+            help="出力先の画像パス",
+        )
+        argperser.add_argument(
+            "-c",
+            "--color",
+            default="#000000",
+            help="画像色",
+        )
+        return argperser
+
+    args = get_argperser().parse_args()
+
+    # パラメータチェック
+
+    # 画像作成
+    out = Path(args.out)
+    image = Image.new("RGB", (args.width, args.height), color=args.color)
+    image.save(out)
+
+    print(f"saved: {out.absolute()}")
 
 
 if __name__ == "__main__":
