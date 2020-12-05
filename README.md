@@ -14,6 +14,8 @@ pip install git+https://github.com/awisu2/imagenatepy.git
 
 ## usage
 
+[samples](docs/samples.md): other samples document.
+
 ### create
 
 ```bash
