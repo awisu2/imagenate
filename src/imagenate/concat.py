@@ -18,7 +18,7 @@ def concat_image_by_path(pathes: List[str], **kwargs) -> Image:
 
     # パスがファイルであるかチェック
     for path in pathes:
-        if not Path(path):
+        if not Path(path).is_file():
             print(f"{path} is not file")
             return None
 
