@@ -1,0 +1,77 @@
+#!/bin/bash
+
+DIR=$(cd $(dirname $0); pwd)
+WORK_DIR="$(cd $DIR/..; pwd)"
+
+. "${DIR}/common.sh"
+
+# methods ==================================================
+sample() {
+  echo_exec_method
+
+  # データが存在するとき
+  if [ -n "$1" ]; then
+    echo_info "args exists: $@"
+  else
+    echo_info "args nothing"
+  fi
+
+  run_with_echo analyze_os
+  echo_info "OS: $OS"
+
+  cd_work_dir
+  run_with_echo pwd
+}
+
+cd_work_dir() {
+  run_with_echo cd $WORK_DIR
+}
+
+run_test() {
+  cd_work_dir
+  run_with_echo python setup.py test "$@"
+}
+
+# exec  ==================================================
+_help() {
+  echo "$HELP"
+}
+
+HELP=$(cat << 'END'
+Usage: $0 command
+
+Commands:
+  test : run `setup.py test`
+
+END
+)
+
+_arg_parse() {
+  _ARGS=()
+  while [ -n "$1" ]; do
+    case $1 in
+      # custom ----------
+      # -a| --any) _A=$2; shift ;;
+      # -b| --bool) _B=1 ;;
+      # ----------
+      -h| --help) _help; exit 0 ;;
+      *)
+        # 最初の空引数はコマンド名
+        if [ -z "$_CMD" ]; then
+          _CMD=$1
+        else
+          _ARGS+=( $1 )
+        fi
+        ;;
+    esac
+    shift
+  done
+}
+
+_arg_parse "$@"
+case "$_CMD" in
+  # sample) sample "${_ARGS[@]}" ;;
+  test) run_test "${_ARGS[@]}" ;;
+
+  *) _help ;;
+esac
