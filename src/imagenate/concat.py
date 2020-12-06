@@ -5,6 +5,7 @@ import math
 from PIL import Image
 from imagenate.libs.enum import CustomEnum
 from imagenate.main.create import create
+from imagenate.resize import ResizeKind, resize
 
 # TODO: 可能ならライブラリのクラス使いたい
 class Position:
@@ -108,6 +109,8 @@ def concat_image_by_dir(
     prefix: str = "concat",
     add_dir: bool = False,
     add_verbose: bool = False,
+    resize_size: Tuple[int, int] = None,
+    resize_kind: ResizeKind = ResizeKind.INNER,
     **kwargs,
 ) -> List[Path]:
     """パスをもとに画像を結合"""
@@ -158,6 +161,9 @@ def concat_image_by_dir(
         if len(images) < num:
             continue
         image = concat_image(images, row=row, col=col, **kwargs)
+        if resize_size:
+            image = resize(image, resize_size[0], resize_size[1], kind=resize_kind)
+
         path = out_path / _create_name(i)
         image.save(path)
         created_pathes.append(path)
@@ -165,8 +171,12 @@ def concat_image_by_dir(
         images = []
         i += 1
 
+    # 1画像に必要な枚数
     if images:
         image = concat_image(images, row=row, col=col, **kwargs)
+        if resize_size:
+            image = resize(image, resize_size[0], resize_size[1], kind=resize_kind)
+
         path = out_path / _create_name(i)
         image.save(path)
         created_pathes.append(path)

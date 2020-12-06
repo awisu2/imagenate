@@ -29,4 +29,9 @@ imagenate create --height 100 --width 100 --color '#FF0' -o yellow_100x100.png
 
 ```bash
 imagenate concat -i red_100x100.png green_100x100.png blue_100x100.png yellow_100x100.png -o concat.png -r 2 -c 2
+
+# with resize
+imagenate concat -i red_100x100.png green_100x100.png blue_100x100.png yellow_100x100.png -o concat_resize_inner.png -r 2 -c 2  --resize_size hd
+imagenate concat -i red_100x100.png green_100x100.png blue_100x100.png yellow_100x100.png -o concat_resize_outer.png -r 2 -c 2  --resize_size hd --resize_kind outer
+imagenate concat -i red_100x100.png green_100x100.png blue_100x100.png yellow_100x100.png -o concat_resize_force.png -r 2 -c 2  --resize_size hd --resize_kind force
 ```
