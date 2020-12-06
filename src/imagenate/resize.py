@@ -57,7 +57,7 @@ def resize(
     image: Image, width: int, height: int, *, kind: ResizeKind = ResizeKind.INNER
 ):
     if kind == ResizeKind.FORCE:
-        return image.resize(width, height)
+        return image.resize((width, height), resample=Image.NEAREST)
 
     rate = get_rate_for_resize(image, width, height, kind=kind)
     if not rate == 1:

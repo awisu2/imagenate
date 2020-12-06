@@ -148,7 +148,7 @@ def concat():
     resize_size = _get_size(args.resize_size) if args.resize_size else None
     if resize_size:
         resize_kind = ResizeKind(args.resize_kind)
-        image = resize(image, resize_size[0], resize_size[1], resize_kind)
+        image = resize(image, resize_size[0], resize_size[1], kind=resize_kind)
     image.save(out)
     print(f"saved: {out.absolute()}")
 
