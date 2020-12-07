@@ -10,6 +10,8 @@ simple image manager for my study.
 
 ```bash
 pip install git+https://github.com/awisu2/imagenatepy.git
+# upgrade version
+pip install -U git+https://github.com/awisu2/imagenatepy.git
 ```
 
 ## usage
