@@ -34,4 +34,8 @@ imagenate concat -i red_100x100.png green_100x100.png blue_100x100.png yellow_10
 imagenate concat -i red_100x100.png green_100x100.png blue_100x100.png yellow_100x100.png -o concat_resize_inner.png -r 2 -c 2  --resize_size hd
 imagenate concat -i red_100x100.png green_100x100.png blue_100x100.png yellow_100x100.png -o concat_resize_outer.png -r 2 -c 2  --resize_size hd --resize_kind outer
 imagenate concat -i red_100x100.png green_100x100.png blue_100x100.png yellow_100x100.png -o concat_resize_force.png -r 2 -c 2  --resize_size hd --resize_kind force
+
+# with arrangement(並び順)
+imagenate concat -i red_100x100.png green_100x100.png blue_100x100.png yellow_100x100.png -o concat_reverse_col.png -r 2 -c 2 --arrangement rev-col
+imagenate concat -i red_100x100.png green_100x100.png blue_100x100.png yellow_100x100.png -o concat_reverse.png -r 2 -c 2 --arrangement rev
 ```

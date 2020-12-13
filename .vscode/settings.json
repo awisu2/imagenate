@@ -1,4 +1,6 @@
 {
+  "editor.formatOnSave": true,
+
   // python settings
   "python.venvPath": ".venv",
   "python.pythonPath": "/Users/ohtaniyuichi/.pyenv/versions/3.7.0/bin/python",
@@ -12,5 +14,4 @@
   "python.linting.flake8Args": [
     "--max-line-length=88"
   ],
-  "editor.formatOnSave": true
 }
