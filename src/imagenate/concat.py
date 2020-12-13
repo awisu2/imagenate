@@ -81,6 +81,31 @@ class CelPosition(CustomEnum):
         ]
 
 
+class Arrangement(CustomEnum):
+    """並べ方
+    デフォルトでは、上から下、左から右に並べる
+    """
+
+    NORMAL = "non"
+    REVERSE_COL = "rev-col"
+    REVERSE_ROW = "rev-row"
+    REVERSE = "rev"
+
+    @property
+    def is_reverse_row(self) -> bool:
+        return self in (
+            Arrangement.REVERSE_ROW,
+            Arrangement.REVERSE,
+        )
+
+    @property
+    def is_reverse_col(self) -> bool:
+        return self in (
+            Arrangement.REVERSE_COL,
+            Arrangement.REVERSE,
+        )
+
+
 def concat_image_by_path(pathes: List[str], **kwargs) -> Image:
     """パスをもとに画像を結合"""
 
@@ -261,6 +286,7 @@ def concat_image(
     row: int = 0,
     col: int = 0,
     cel_position: CelPosition = CelPosition.CENTER,
+    arrangement: Arrangement = Arrangement.NORMAL,
 ) -> Image:
     """画像を結合したオブジェクトを返却"""
 
@@ -281,11 +307,15 @@ def concat_image(
     # 貼り付け
     image = Image.new("RGB", (sum(widthes), sum(heights)))
     pos = Position()
-    for r in range(0, len(grid)):
+
+    row_idxs = range(0, len(grid))
+    for r in reversed(row_idxs) if arrangement.is_reverse_row else row_idxs:
         line = grid[r]
         pos.x = 0
         height = heights[r]
-        for c in range(0, len(line)):
+
+        col_idxs = range(0, len(grid))
+        for c in reversed(col_idxs) if arrangement.is_reverse_col else col_idxs:
             cel = line[c]
             width = widthes[c]
 

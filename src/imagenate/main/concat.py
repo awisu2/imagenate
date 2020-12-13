@@ -2,7 +2,12 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 from imagenate.main.share import create_base_argperser
-from imagenate.concat import concat_image_by_path, concat_image_by_dir, CelPosition
+from imagenate.concat import (
+    concat_image_by_path,
+    concat_image_by_dir,
+    CelPosition,
+    Arrangement,
+)
 from imagenate.resize import ResizeKind, resize
 from imagenate.libs.const import Sizes
 
@@ -41,6 +46,13 @@ def _get_argperser() -> ArgumentParser:
         choices=ResizeKind.get_values(),
         default=ResizeKind.INNER,
         help="リサイズする際の方法. {}".format(ResizeKind.get_help()),
+    )
+    argperser.add_argument(
+        "--arrangement",
+        type=str,
+        choices=Arrangement.get_values(),
+        default=Arrangement.NORMAL,
+        help="並べ方(デフォルトでは上から下、左から右)",
     )
     return argperser
 
@@ -139,7 +151,11 @@ def concat():
     out = Path(args.out)
     cel_position = CelPosition(args.cel_position)
     image = concat_image_by_path(
-        args.input, row=args.row, col=args.col, cel_position=cel_position
+        args.input,
+        row=args.row,
+        col=args.col,
+        cel_position=cel_position,
+        arrangement=Arrangement(args.arrangement),
     )
     if not image:
         print("missing create concat image")
@@ -148,7 +164,12 @@ def concat():
     resize_size = _get_size(args.resize_size) if args.resize_size else None
     if resize_size:
         resize_kind = ResizeKind(args.resize_kind)
-        image = resize(image, resize_size[0], resize_size[1], kind=resize_kind)
+        image = resize(
+            image,
+            resize_size[0],
+            resize_size[1],
+            kind=resize_kind,
+        )
     image.save(out)
     print(f"saved: {out.absolute()}")
 
@@ -177,6 +198,7 @@ def concat_dir():
         add_verbose=args.add_verbose,
         resize_size=resize_size,
         resize_kind=ResizeKind(args.resize_kind),
+        arrangement=Arrangement(args.arrangement),
     )
 
     print("created:")
