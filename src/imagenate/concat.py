@@ -4,11 +4,11 @@ import math
 
 from PIL import Image
 from imagenate.libs.enum import CustomEnum
-from imagenate.main.create import create
 from imagenate.resize import ResizeKind, resize
 
-# TODO: 可能ならライブラリのクラス使いたい
+
 class Position:
+    # TODO: 可能ならライブラリのクラス使いたい
     x: int = 0
     y: int = 0
 
@@ -178,7 +178,7 @@ def concat_image_by_dir(
         image: Image = None
         try:
             image = Image.open(item)
-        except:
+        except Exception:
             continue
         images.append(image)
 

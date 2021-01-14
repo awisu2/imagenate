@@ -7,6 +7,8 @@ class Command(CustomEnum):
     CONCAT = "concat"
     CONCAT_DIR = "concat_dir"
     CREATE = "create"
+    INFO = "info"
+    RESIZE = "resize"
 
 
 def create_base_argperser() -> ArgumentParser:

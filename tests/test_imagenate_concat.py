@@ -1,5 +1,5 @@
 import unittest
-from imagenate.concat import concat_image_by_path, Direction
+from imagenate.concat import concat_image_by_path
 import os
 
 
@@ -13,7 +13,6 @@ class TestImagenate(unittest.TestCase):
                 "tests/assets/red_100x50.png",
                 "tests/assets/green_100x50.png",
             ],
-            direction=Direction.HORIZONTAL,
         )
         print(img)
         img.save("concat.png")

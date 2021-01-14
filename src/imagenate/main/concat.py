@@ -134,7 +134,7 @@ def _get_size(size_str: str):
             int(size[0]),
             int(size[1]),
         )
-    except:
+    except Exception:
         return None
 
 
